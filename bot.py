@@ -2,8 +2,8 @@ import os
 import praw
 import discord
 import random
+import requests
 from dotenv import load_dotenv
-from discord.ext import commands
 from imgurpython import ImgurClient
 
 # LOAD .env FILE
@@ -23,8 +23,6 @@ D_Client = discord.Client()
 # LOAD IMGUR CLIENT
 imgur = ImgurClient(ImgurID, ImgurSecret)
 
-# SET BOT COMMAND PREFIX
-bot = commands.Bot(command_prefix='!')
 
 # SET praw SECRETS
 reddit = praw.Reddit(
@@ -32,35 +30,5 @@ reddit = praw.Reddit(
      client_secret=sec,
      user_agent=U_Agent
      )
-
-
-# PRINT MESSAGE WHEN BOT HAS CONNECTED
-@bot.event
-async def on_ready():
-    print(f'{bot.user} has connected')
-
-
-# SET CHANNEL ID
-channel = bot.get_channel(id(643901893231509524))
-
-
-# BOT COMMAND 1
-@bot.command("dziala")
-async def on_message(message):
-    if message.author == D_Client.user:
-        return
-    await message.channel.send("Ty się nadajesz")
-
-
-# BOT COMMAND 2
-@bot.command("karol")
-async def on_message(message):
-    if message.author == D_Client.user:
-        return
-    if commands.Bot("karol"):
-        album = imgur.get_album_images('8v1CcEw')
-        item = album[random.randint(0, len(album))]
-        await message.channel.send(item.link)
-
 
 bot.run(TOKEN)
