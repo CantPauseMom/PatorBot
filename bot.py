@@ -49,8 +49,7 @@ channel = bot.get_channel(id(643901893231509524))
 async def on_message(message):
     if message.author == D_Client.user:
         return
-    if commands.Bot("reddit"):
-        await message.channel.send("Ty się nadajesz")
+    await message.channel.send("Ty się nadajesz")
 
 
 # BOT COMMAND 2
@@ -60,7 +59,7 @@ async def on_message(message):
         return
     if commands.Bot("karol"):
         album = imgur.get_album_images('8v1CcEw')
-        item = album[random.randint(1, 8)]
+        item = album[random.randint(0, len(album))]
         await message.channel.send(item.link)
 
 
