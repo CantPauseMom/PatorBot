@@ -3,6 +3,7 @@ import os
 import praw
 import discord
 import time
+import gevent
 import random
 import requests
 import json
@@ -22,6 +23,7 @@ U_Agent = os.getenv('user_agent')
 ImgurID = os.getenv('IMGUR_ID')
 ImgurSecret = os.getenv('IMGUR_SECRET')
 API_ENDPOINT = 'https://discord.com/api/v8'
+uri = 'wss://gateway.discord.gg/?v=8&encoding=json'
 # CREATE DISCORD CLIENT INSTANCE
 D_Client = discord.Client()
 
@@ -35,53 +37,57 @@ reddit = praw.Reddit(
      user_agent=U_Agent
      )
 
-class Connection():
-    def get_token(self):
 
-        data = {
-            'grant_type': 'client_credentials',
-            'scope': 'bot'
-        }
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-        r = requests.post('%s/oauth2/token' % API_ENDPOINT, data=data, headers=headers, auth=(client, sec))
-        r.raise_for_status()
-        return r.json()
+def get_token():
 
-    def get_gateway(self):
-        request = requests.get('%s/gateway' % API_ENDPOINT)
-        request.raise_for_status()
-        return request.json()
+    data = {
+        'grant_type': 'client_credentials',
+        'scope': 'bot'
+    }
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    r = requests.post('%s/oauth2/token' % API_ENDPOINT, data=data, headers=headers, auth=(client, sec))
+    r.raise_for_status()
+    return r.json()
 
-    def get_info(self):
-        uri = 'wss://gateway.discord.gg/?v=8&encoding=json'
-        conn = create_connection(uri)
-        global result
-        result = conn.recv()
 
-        J_File = json.dumps(result)
-        test = json.loads(J_File)
-
-        return result
-
-    def get_heartbeatrate(self):
-        heartbeat_rate = result[53:58]
-        return heartbeat_rate
-
-    def connect(self):
-        uri = 'wss://gateway.discord.gg/?v=8&encoding=json'
-
-        send_opcode1 ={
+async def establish_connection():
+    conn = create_connection(uri)
+    result = conn.recv()
+    heartbeat_rate = result[53:58]
+    print(heartbeat_rate)
+    opcode1 = {
         "op": 1,
         "d": None
+    }
+    loop = asyncio.get_event_loop()
+
+    async def send_opcode1():
+        json_pack = json.dumps(opcode1)
+        await conn.send(json_pack)
+        gevent.sleep(int(heartbeat_rate) / 1000)
+        print("package sent")
+
+    loop.run_forever(send_opcode1())
+    pack = {
+        "op": 2,
+        "d": {
+            "token": TOKEN,
+            "intents": 513,
+            "properties": {
+                "$os": "windows",
+                "$browser": "my_library",
+                "$device": "my_library"
+            }
         }
+    }
+    pack_json = json.dumps(pack)
+    conn.send(pack_json)
+    print("pack sent")
 
+print(get_token())
 
-    print(get_gateway())
-    print(get_token())
-    print(get_info())
-    print(get_heartbeatrate())
 while True:
     print('got into loop')
-    time.sleep(20)
+    time.sleep(10)
