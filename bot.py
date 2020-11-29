@@ -61,15 +61,15 @@ async def establish_connection():
         "op": 1,
         "d": None
     }
-    loop = asyncio.get_event_loop()
 
     async def send_opcode1():
+        loop = asyncio.new_event_loop()
         json_pack = json.dumps(opcode1)
         await conn.send(json_pack)
         gevent.sleep(int(heartbeat_rate) / 1000)
         print("package sent")
+        loop.run_forever()
 
-    loop.run_forever(send_opcode1())
     pack = {
         "op": 2,
         "d": {
@@ -87,7 +87,7 @@ async def establish_connection():
     print("pack sent")
 
 print(get_token())
+asyncio.run(establish_connection())
 
 while True:
-    print('got into loop')
-    time.sleep(10)
+    time.sleep(5)
