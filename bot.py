@@ -42,7 +42,7 @@ class Data:
     uri = "wss://gateway.discord.gg/"
     TOKEN = os.getenv('DISCORD_TOKEN')
 
-    data = {
+    credentials = {
         'grant_type': 'client_credentials',
         'scope': 'bot'
     }
@@ -72,12 +72,14 @@ class HTTP(Data):
     def get_gateway(self, API_ENDPOINT):
         response = requests.get(f'{API_ENDPOINT}/gateway').json()
         data = response['url']
+        print("got gateway")
         return data
 
-    def get_bot_gateway(self, API_ENDPOINT):
-        response = requests.get(f'{API_ENDPOINT}/gateway').json()
-        data = response['url']
-        return data
+    # def get_bot_gateway(self, API_ENDPOINT):
+    #     response = requests.get(f'{API_ENDPOINT}/gateway/bot').json()
+    #     data = response['url']
+    #     print("got bot gateway")
+    #     return data
 
     def get_heartbeat(self, data):
         conn = create_connection(data)
@@ -85,18 +87,24 @@ class HTTP(Data):
         result_json = json.loads(result)
         json_slice = result_json['d']
         heartbeat = json_slice['heartbeat_interval']
-        print(heartbeat)
+        print("got heartbeat")
         return heartbeat
 
     def send_heartbeat(self, data, heartbeat, opcode1):
         while True:
+            print("sending heartbeat")
             conn = create_connection(data)
-            conn.send(opcode1)
+            packet = json.dumps(opcode1)
+            conn.send(packet)
             gevent.sleep(heartbeat / 1000)
+            print("heartbeat sent")
 
     def send_identity(self, data, pack):
+        print(data)
         conn = create_connection(data)
-        conn.send(pack)
+        packet = json.dumps(pack)
+        conn.send(packet)
+        print("pack sent")
 
 
 class Client:
@@ -106,9 +114,10 @@ class Client:
 
 
 HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)
-HTTP.get_bot_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)
 HTTP.get_heartbeat(HTTP,HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT))
-gevent.spawn(HTTP.send_heartbeat(HTTP, data=Data.data, heartbeat=HTTP.get_heartbeat(HTTP, data=Data.data), opcode1=Data.opcode1))
+HTTP.send_identity(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), pack=Data.pack)
+gevent.spawn(HTTP.send_heartbeat(HTTP, HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), heartbeat=HTTP.get_heartbeat(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)),opcode1=Data.opcode1))
+
 if __name__ == '__main__':
     while True:
         print('end')
