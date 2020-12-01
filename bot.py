@@ -116,7 +116,9 @@ class Client:
 HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)
 HTTP.get_heartbeat(HTTP,HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT))
 HTTP.send_identity(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), pack=Data.pack)
-gevent.spawn(HTTP.send_heartbeat(HTTP, HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), heartbeat=HTTP.get_heartbeat(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)),opcode1=Data.opcode1))
+gevent.spawn(HTTP.send_heartbeat(HTTP, HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT),
+                                 heartbeat=HTTP.get_heartbeat(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)),
+                                 opcode1=Data.opcode1))
 
 if __name__ == '__main__':
     while True:
