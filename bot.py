@@ -71,12 +71,11 @@ class HTTP(Data):
     #     print("got bot gateway")
     #     return data
 
-    def create_connection(self, data):
+    def make_connection(self, data):
         conn = create_connection(data)
         return conn
 
     def get_heartbeat(self, data, conn):
-        #conn = create_connection(data)
         result = conn.recv()
         result_json = json.loads(result)
         json_slice = result_json['d']
@@ -87,7 +86,6 @@ class HTTP(Data):
     def send_heartbeat(self, data, heartbeat, opcode1, conn):
         while True:
             print("sending heartbeat")
-            #conn = create_connection(data)
             packet = json.dumps(opcode1)
             conn.send(packet)
             gevent.sleep(heartbeat / 1000)
@@ -95,7 +93,6 @@ class HTTP(Data):
 
     def send_identity(self, data, pack, conn):
         print(data)
-        #conn = create_connection(data)
         packet = json.dumps(pack)
         conn.send(packet)
         print("pack sent")
@@ -108,11 +105,13 @@ class Client:
 
 
 HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)
-HTTP.get_heartbeat(HTTP,HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT))
-HTTP.send_identity(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), pack=Data.pack)
+HTTP.make_connection(HTTP,HTTP.get_gateway(HTTP,Data.API_ENDPOINT))
+HTTP.get_heartbeat(HTTP,HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), conn=HTTP.make_connection(HTTP, HTTP.get_gateway(HTTP,API_ENDPOINT=Data.API_ENDPOINT)))
+HTTP.send_identity(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), pack=Data.pack, conn=HTTP.make_connection(HTTP,HTTP.get_gateway(HTTP,API_ENDPOINT=Data.API_ENDPOINT)))
 gevent.spawn(HTTP.send_heartbeat(HTTP, HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT),
-                                 heartbeat=HTTP.get_heartbeat(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)),
-                                 opcode1=Data.opcode1))
+                                 heartbeat=HTTP.get_heartbeat(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT),conn=HTTP.make_connection(HTTP,HTTP.get_gateway(HTTP,API_ENDPOINT=Data.API_ENDPOINT))),
+                                 opcode1=Data.opcode1,
+                                 conn=HTTP.make_connection(HTTP,HTTP.get_gateway(HTTP,Data.API_ENDPOINT))))
 
 if __name__ == '__main__':
     while True:
