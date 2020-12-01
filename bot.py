@@ -71,8 +71,12 @@ class HTTP(Data):
     #     print("got bot gateway")
     #     return data
 
-    def get_heartbeat(self, data):
+    def create_connection(self, data):
         conn = create_connection(data)
+        return conn
+
+    def get_heartbeat(self, data, conn):
+        #conn = create_connection(data)
         result = conn.recv()
         result_json = json.loads(result)
         json_slice = result_json['d']
@@ -80,18 +84,18 @@ class HTTP(Data):
         print("got heartbeat")
         return heartbeat
 
-    def send_heartbeat(self, data, heartbeat, opcode1):
+    def send_heartbeat(self, data, heartbeat, opcode1, conn):
         while True:
             print("sending heartbeat")
-            conn = create_connection(data)
+            #conn = create_connection(data)
             packet = json.dumps(opcode1)
             conn.send(packet)
             gevent.sleep(heartbeat / 1000)
             print("heartbeat sent")
 
-    def send_identity(self, data, pack):
+    def send_identity(self, data, pack, conn):
         print(data)
-        conn = create_connection(data)
+        #conn = create_connection(data)
         packet = json.dumps(pack)
         conn.send(packet)
         print("pack sent")
