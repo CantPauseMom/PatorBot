@@ -104,10 +104,17 @@ class Client:
         self.http = HTTP
 
 
-HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)
-HTTP.make_connection(HTTP,HTTP.get_gateway(HTTP,Data.API_ENDPOINT))
-HTTP.get_heartbeat(HTTP,HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), conn=HTTP.make_connection(HTTP, HTTP.get_gateway(HTTP,API_ENDPOINT=Data.API_ENDPOINT)))
-HTTP.send_identity(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT), pack=Data.pack, conn=HTTP.make_connection(HTTP,HTTP.get_gateway(HTTP,API_ENDPOINT=Data.API_ENDPOINT)))
+HTTP.get_gateway(HTTP,
+                 API_ENDPOINT=Data.API_ENDPOINT)
+HTTP.make_connection(HTTP,
+                     data=HTTP.get_gateway(HTTP,Data.API_ENDPOINT))
+HTTP.get_heartbeat(HTTP,
+                   data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT),
+                   conn=HTTP.make_connection(HTTP, HTTP.get_gateway(HTTP,API_ENDPOINT=Data.API_ENDPOINT)))
+HTTP.send_identity(HTTP,
+                   data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT),
+                   pack=Data.pack,
+                   conn=HTTP.make_connection(HTTP,HTTP.get_gateway(HTTP,API_ENDPOINT=Data.API_ENDPOINT)))
 gevent.spawn(HTTP.send_heartbeat(HTTP, HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT),
                                  heartbeat=HTTP.get_heartbeat(HTTP, data=HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT),conn=HTTP.make_connection(HTTP,HTTP.get_gateway(HTTP,API_ENDPOINT=Data.API_ENDPOINT))),
                                  opcode1=Data.opcode1,
