@@ -80,7 +80,7 @@ class HTTP(Data):
         data = response['url']
         return data
 
-    def get_heartbeat(self, data,):
+    def get_heartbeat(self, data):
         conn = create_connection(data)
         result = conn.recv()
         result_json = json.loads(result)
