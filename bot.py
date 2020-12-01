@@ -88,6 +88,16 @@ class HTTP(Data):
         print(heartbeat)
         return heartbeat
 
+    def send_heartbeat(self, data, heartbeat, opcode1):
+        while True:
+            conn = create_connection(data)
+            conn.send(opcode1)
+            gevent.sleep(heartbeat / 1000)
+
+    def send_identity(self, data, pack):
+        conn = create_connection(data)
+        conn.send(pack)
+
 
 class Client:
     def __init__(self):
@@ -95,36 +105,10 @@ class Client:
         self.http = HTTP
 
 
-# async def connection():
-#     async def establish_connection():
-#
-#         conn = create_connection(uri)
-#         result = conn.recv()
-#         heartbeat_rate = result[53:58]
-#         print(heartbeat_rate)
-#
-#         pack_json = json.dumps(pack)
-#         conn.send(pack_json)
-#         print("pack sent")
-#         return opcode1, conn, heartbeat_rate
-#
-#     loop = asyncio.get_event_loop()
-#
-#     async def send_opcode1(opcode1, conn, heartbeat_rate):
-#         while True:
-#             asyncio.new_event_loop()
-#             json_pack = json.dumps(opcode1)
-#             conn.send(json_pack)
-#             print(f"pack sent before sleep. Rate : {heartbeat_rate}")
-#             await gevent.sleep(int(heartbeat_rate) / 1000)
-#             print("package sent")
-#
-#     loop.run_forever()
-#
-# connection()
 HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)
 HTTP.get_bot_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT)
 HTTP.get_heartbeat(HTTP,HTTP.get_gateway(HTTP, API_ENDPOINT=Data.API_ENDPOINT))
+gevent.spawn(HTTP.send_heartbeat(HTTP, data=Data.data, heartbeat=HTTP.get_heartbeat(HTTP, data=Data.data), opcode1=Data.opcode1))
 if __name__ == '__main__':
     while True:
         print('end')
