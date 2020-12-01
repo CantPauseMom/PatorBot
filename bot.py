@@ -1,34 +1,24 @@
-import asyncio
 import os
 import praw
-import discord
 import time
-from gevent import monkey
 import gevent
 import requests
 import json
 from websocket import create_connection
 from dotenv import load_dotenv
 from imgurpython import ImgurClient
-import aiohttp
 
-# LOAD .env FILE
 load_dotenv()
-
-# RETRIEVE SECRETS FROM .env
 
 client = os.getenv('client_id')
 sec = os.getenv('my_client_secret')
 U_Agent = os.getenv('user_agent')
 ImgurID = os.getenv('IMGUR_ID')
 ImgurSecret = os.getenv('IMGUR_SECRET')
-#API_ENDPOINT = 'https://discord.com/api/v8'
 uri = 'wss://gateway.discord.gg/?v=8&encoding=json'
 
-# LOAD IMGUR CLIENT
 imgur = ImgurClient(ImgurID, ImgurSecret)
 
-# SET praw SECRETS
 reddit = praw.Reddit(
      client_id=client,
      client_secret=sec,
