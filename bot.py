@@ -72,7 +72,6 @@ class HTTP(Data):
     def get_gateway(self, API_ENDPOINT):
         response = requests.get(f'{API_ENDPOINT}/gateway').json()
         data = response['url']
-        print(data)
         return data
 
     def get_bot_gateway(self, API_ENDPOINT):
