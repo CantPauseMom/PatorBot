@@ -7,13 +7,11 @@ from websocket import create_connection
 
 class HTTP:
 
-    def __init__(self, data, conn, heartbeat):
-        self.data = data
-        self.conn = conn
-        self.heartbeat = heartbeat
+    def __init__(self):
+
 
     def get_gateway(self):
-        response = requests.get(f'{}/gateway').json()
+        response = requests.get(f'{data.API_ENDPOINT}/gateway').json()
         data = response['url']
         print("got gateway")
         return data
