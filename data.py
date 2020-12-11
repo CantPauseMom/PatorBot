@@ -1,9 +1,12 @@
 import os
 from dotenv import load_dotenv
 load_dotenv()
+client_id = os.getenv('client_id')
 
 
 class Data:
+
+    bot_link = f'https://discord.com/api/oauth2/authorize?client_id={client_id}&scope=bot&permissions=1'
     API_ENDPOINT = 'https://discord.com/api/v8'
 
     uri = "wss://gateway.discord.gg/"
