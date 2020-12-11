@@ -29,9 +29,18 @@ class Data:
             "token": TOKEN,
             "intents": 513,
             "properties": {
-                "$os": "windows",
+                "$os": "android",
                 "$browser": "my_library",
-                "$device": "my_library"
+                "$device": "my_library",
+                "presence": {
+                       "activities": [{
+                           "name": "Senpai works on me",
+                           "type": 0
+                       }],
+                       "status": "dnd",
+                       "since": 91879201,
+                       "afk": "false"
+                },
             }
         }
     }

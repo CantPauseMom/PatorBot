@@ -1,3 +1,5 @@
+from gevent import monkey
+monkey.patch_all()
 import json
 import os
 import time
@@ -47,10 +49,19 @@ def connection():
             gevent.sleep(heartbeat / 1000)
             print("heartbeat sent")
 
-    send_heartbeat(heartbeat=get_heartbeat())
+    def get_ready():
+        ready = conn.recv()
+        print("in on_ready func")
+        print(str(ready))
+
+    gevent.joinall([
+        gevent.spawn(send_heartbeat(heartbeat=get_heartbeat())),
+        gevent.spawn(get_ready())
+        ])
 
 
 connection()
+
 if __name__ == '__main__':
     while True:
         print('end')
