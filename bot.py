@@ -20,6 +20,7 @@ sec = os.getenv('my_client_secret')
 U_Agent = os.getenv('user_agent')
 ImgurID = os.getenv('IMGUR_ID')
 ImgurSecret = os.getenv('IMGUR_SECRET')
+token = os.getenv('DISCORD_TOKEN')
 uri = 'wss://gateway.discord.gg/?v=8&encoding=json'
 API_endpoint = 'https://discord.com/api/v8'
 
@@ -45,7 +46,6 @@ def connection():
             packet = json.dumps(Data.opcode1)
             conn.send(packet)
             gevent.sleep(41250 / 1000)
-
     # send_heartbeat(heartbeat=get_heartbeat())
     thread = threading.Thread(target=send_heartbeat)
     thread.daemon = True
@@ -54,27 +54,37 @@ def connection():
     def send_token():
         packet = json.dumps(Data.pack)
         conn.send(packet)
-        print('packet sent')
 
     send_token()
 
     def get_ready():
-        time.sleep(1)
-        readymsg = conn.recv()
-        print("in on_ready func")
-        print(str(readymsg))
+        while True:
+            time.sleep(1)
+            result = conn.recv()
+            result_json = json.loads(result)
+            json_slice = result_json['op']
+            if json_slice == 11:
+                time.sleep(1)
+                readymsg = conn.recv()
+                print("Connection is ready")
+                print(str(readymsg))
+                time.sleep(5)
+                test = conn.recv()
+                print(str(test))
+                break
 
     tr = threading.Thread(target=get_ready)
     tr.daemon = True
     tr.start()
 
 
-def somefunc():
-    print('someloop')
-    time.sleep(2)
-
-
 connection()
+
+
+def get_message():
+    response = requests.get(f'{API_endpoint}/channels/788843646669422603/messages').json()
+    print(response)
+
 
 if __name__ == '__main__':
     while True:
