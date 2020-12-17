@@ -81,12 +81,34 @@ def connection():
 connection()
 
 
-def get_message():
-    response = requests.get(f'{API_endpoint}/channels/788843646669422603/messages').json()
+def get_me():
+    response = requests.get(f'{API_endpoint}/oauth2/applications/@me').json()
     print(response)
+
+
+def get_message():
+    tex = requests.session()
+    tex.headers.update({'Authorization': 'Bot NzgxNTcyMDU3NTA5OTIwODEw.X7_lsw.4t3EK_YHeNHYwe21aiWtRYPfe5k'})
+    response = tex.get(f'{API_endpoint}/channels/788843646669422603/messages').json()
+    print(response)
+
+
+def create_message():
+    example = {
+        "content": "Hello, World!",
+        "tts": False,
+        "embed": {
+            "title": "Hello, Embed!",
+            "description": "This is an embedded message."
+        }
+    }
+    msg = json.dumps(example)
+    requests.post(f'{API_endpoint}/channels/788843646669422603/messages')
 
 
 if __name__ == '__main__':
     while True:
         print('end')
+        get_message()
+        #get_me()
         time.sleep(5)
