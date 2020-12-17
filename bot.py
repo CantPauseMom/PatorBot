@@ -88,7 +88,7 @@ def get_me():
 
 def get_message():
     tex = requests.session()
-    tex.headers.update({'Authorization': 'Bot NzgxNTcyMDU3NTA5OTIwODEw.X7_lsw.4t3EK_YHeNHYwe21aiWtRYPfe5k'})
+    tex.headers.update({'Authorization': 'Bot '})
     response = tex.get(f'{API_endpoint}/channels/788843646669422603/messages').json()
     print(response)
 
