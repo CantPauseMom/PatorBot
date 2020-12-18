@@ -103,9 +103,9 @@ def create_message():
         }
     }
     msg = json.dumps(example)
-    requests.post(f'{API_endpoint}/channels/788843646669422603/messages')
+    requests.post(f'{API_endpoint}/channels/788843646669422603/messages', data=msg)
 
-
+create_message()
 if __name__ == '__main__':
     while True:
         print('end')
