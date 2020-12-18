@@ -46,7 +46,7 @@ def connection():
             packet = json.dumps(Data.opcode1)
             conn.send(packet)
             gevent.sleep(41250 / 1000)
-    # send_heartbeat(heartbeat=get_heartbeat())
+
     thread = threading.Thread(target=send_heartbeat)
     thread.daemon = True
     thread.start()
@@ -68,7 +68,6 @@ def connection():
                 readymsg = conn.recv()
                 print("Connection is ready")
                 print(str(readymsg))
-                time.sleep(5)
                 test = conn.recv()
                 print(str(test))
                 break
@@ -77,6 +76,16 @@ def connection():
     tr.daemon = True
     tr.start()
 
+    def listen():
+        while True:
+            print('in listen')
+            time.sleep(0.2)
+            result = conn.recv()
+            print(result)
+
+    listener = threading.Thread(target=listen)
+    listener.daemon = True
+    listener.start()
 
 connection()
 
@@ -103,12 +112,17 @@ def create_message():
         }
     }
     msg = json.dumps(example)
-    requests.post(f'{API_endpoint}/channels/788843646669422603/messages', data=msg)
+    print(msg)
+    new = requests.post(f'{API_endpoint}/channels/788843646669422603/messages',
+                        json=msg,
+                        headers={'Authorization': f'Bot {token}',
+                                 'Content-Type': 'application/json'})
+    print(str(new))
 
 create_message()
 if __name__ == '__main__':
     while True:
         print('end')
-        get_message()
-        #get_me()
+
+        #get_message()
         time.sleep(5)
