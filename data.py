@@ -42,5 +42,6 @@ class Data:
                        "afk": "false"
                 },
             }
-        }
+        },
+        "intents": 10
     }

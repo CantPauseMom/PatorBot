@@ -29,20 +29,16 @@ def connection():
     response = requests.get(f'{API_endpoint}/gateway').json()
     data = response['url']
     conn = create_connection(data)
-    print('conn made')
 
     def get_heartbeat():
         result = conn.recv()
         result_json = json.loads(result)
         json_slice = result_json['d']
         heartbeat = json_slice['heartbeat_interval']
-        print("got heartbeat")
-        print('Heartbeat =', heartbeat)
         return heartbeat
 
     def send_heartbeat():
         while True:
-            print("sending heartbeat")
             packet = json.dumps(Data.opcode1)
             conn.send(packet)
             gevent.sleep(41250 / 1000)
@@ -66,10 +62,7 @@ def connection():
             if json_slice == 11:
                 time.sleep(1)
                 readymsg = conn.recv()
-                print("Connection is ready")
                 print(str(readymsg))
-                test = conn.recv()
-                print(str(test))
                 break
 
     tr = threading.Thread(target=get_ready)
@@ -78,7 +71,6 @@ def connection():
 
     def listen():
         while True:
-            print('in listen')
             time.sleep(0.2)
             result = conn.recv()
             print(result)
@@ -87,42 +79,37 @@ def connection():
     listener.daemon = True
     listener.start()
 
+    def create_message():
+        example = {
+            "content": "Hello, World!",
+            "tts": False
+        }
+        headers = {'Content-Type': 'application/json',
+                   'Authorization': f'Bot {token}'}
+        msg = json.dumps(example)
+        print(msg)
+        new1 = requests.session()
+        new = new1.post(f'{API_endpoint}/channels/788843646669422603/messages',
+                        headers=headers, data=msg)
+        new.raise_for_status()
+        print(new)
+
+    create_message()
 connection()
 
 
-def get_me():
-    response = requests.get(f'{API_endpoint}/oauth2/applications/@me').json()
-    print(response)
+# def get_me():
+#     response = requests.get(f'{API_endpoint}/oauth2/applications/@me').json()
+#     print(response)
 
 
-def get_message():
-    tex = requests.session()
-    response = tex.get(f'{API_endpoint}/channels/788843646669422603/messages',
-                       headers={'Authorization': f'Bot {token}'}).json()
-    print(response)
+# def get_message():
+#     tex = requests.session()
+#     response = tex.get(f'{API_endpoint}/channels/788843646669422603/messages',
+#                        headers={'Authorization': f'Bot {token}'}).json()
+#     print(response)
 
 
-def create_message():
-    example = {
-        "content": "Hello, World!",
-        "tts": False,
-        "embed": {
-            "title": "Hello, Embed!",
-            "description": "This is an embedded message."
-        }
-    }
-    msg = json.dumps(example)
-    print(msg)
-    new = requests.post(f'{API_endpoint}/channels/788843646669422603/messages',
-                        json=msg,
-                        headers={'Authorization': f'Bot {token}',
-                                 'Content-Type': 'application/json'})
-    print(str(new))
-
-create_message()
 if __name__ == '__main__':
     while True:
-        print('end')
-
-        #get_message()
         time.sleep(5)
