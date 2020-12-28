@@ -62,54 +62,103 @@ def connection():
             if json_slice == 11:
                 time.sleep(1)
                 readymsg = conn.recv()
-                print(str(readymsg))
                 break
 
     tr = threading.Thread(target=get_ready)
     tr.daemon = True
     tr.start()
 
+
     def listen():
         while True:
-            time.sleep(0.2)
+            #time.sleep(0.2)
             result = conn.recv()
-            print(result)
+
+            json_object = json.loads(result)
+            name = json_object['t']
+            print(str(result))
+            if name == "MESSAGE_CREATE":
+                sliced = json_object['d']['content']
+                if sliced == '!hello':
+                    id = json_object['d']['channel_id']
+                    name = json_object['d']['author']['username']
+                    example = {
+                        "content": f"Hello, {name}",
+                        "tts": False
+                    }
+                    headers = {'Content-Type': 'application/json',
+                               'Authorization': f'Bot {token}'}
+                    msg = json.dumps(example)
+                    print(msg)
+                    new1 = requests.session()
+                    new = new1.post(f'{API_endpoint}/channels/{id}/messages',
+                                    headers=headers, data=msg)
+                    new.raise_for_status()
+                    print(new)
+                if sliced == '!temp':
+                    id = json_object['d']['channel_id']
+                    name = json_object['d']['author']['username']
+                    example = {
+                        "content": f"Ty się {name} nadajesz",
+                        "tts": False
+                    }
+                    headers = {'Content-Type': 'application/json',
+                               'Authorization': f'Bot {token}'}
+                    msg = json.dumps(example)
+                    print(msg)
+                    new1 = requests.session()
+                    new = new1.post(f'{API_endpoint}/channels/{id}/messages',
+                                    headers=headers, data=msg)
+                    new.raise_for_status()
+                    print(new)
+                if sliced == '!help':
+                    id = json_object['d']['channel_id']
+                    example = {
+                        "content": f"Available commands:\n"
+                                   f"!help\n"
+                                   f"!hello\n"
+                                   f"!temp",
+                        "tts": False
+                    }
+                    headers = {'Content-Type': 'application/json',
+                               'Authorization': f'Bot {token}'}
+                    msg = json.dumps(example)
+                    new1 = requests.session()
+                    new = new1.post(f'{API_endpoint}/channels/{id}/messages',
+                                    headers=headers, data=msg)
+                    new.raise_for_status()
+                if sliced == '!voice':
+                    json_object = json.loads(result)
+                    guild_id = json_object['d']['guild_id']
+                    voice1 = {
+                        "op": 4,
+                        "d": {
+                            "guild_id": f"{guild_id}",
+                            "channel_id": "643895289081495566",
+                            "self_mute": False,
+                            "self_deaf": False
+                        }
+                    }
+                    voice = json.dumps(voice1)
+                    conn.send(voice)
+
+
 
     listener = threading.Thread(target=listen)
     listener.daemon = True
     listener.start()
 
-    def create_message():
-        example = {
-            "content": "Hello, World!",
-            "tts": False
-        }
-        headers = {'Content-Type': 'application/json',
-                   'Authorization': f'Bot {token}'}
-        msg = json.dumps(example)
-        print(msg)
-        new1 = requests.session()
-        new = new1.post(f'{API_endpoint}/channels/788843646669422603/messages',
-                        headers=headers, data=msg)
-        new.raise_for_status()
-        print(new)
+    try:
+        pass
+    except KeyboardInterrupt:
+        print('end')
+        conn.close()
+        exit()
+        #--audio-format FORMAT
 
-    create_message()
-connection()
-
-
-# def get_me():
-#     response = requests.get(f'{API_endpoint}/oauth2/applications/@me').json()
-#     print(response)
-
-
-# def get_message():
-#     tex = requests.session()
-#     response = tex.get(f'{API_endpoint}/channels/788843646669422603/messages',
-#                        headers={'Authorization': f'Bot {token}'}).json()
-#     print(response)
-
-
+    #https: // www.youtube.com / watch?v = Kd8EDlm83Fc & feature = youtu.be
 if __name__ == '__main__':
+    connection()
     while True:
         time.sleep(5)
+
